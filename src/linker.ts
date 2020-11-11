@@ -1,5 +1,4 @@
 import * as asyncify from "asyncify-wasm";
-import { use } from "chai";
 import { Store } from "./store";
 
 /**
