@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <header>
+    <script type="module" src="../dist/wasm-linker.js"></script>
+  </header>
+  <body>
+    <script type="module" language="javascript" type="text/javascript">
+      (async () => {
+        var linker = new Linker();
+
+        linker.define("calculator", "add", (a, b) => a + b);
+        linker.define("calculator", "multiply", (a, b) => a * b);
+        linker.define("calculator", "subtract", (a, b) => a - b);
+        linker.define("calculator", "divide", (a, b) => a / b);
+
+        // using_calculator.wasm imports a list of mathematical operations
+        var bytes = await (await fetch("using_calculator.wasm")).arrayBuffer();
+        var mod = await linker.instantiate(bytes);
+        console.log(mod.instance.exports.add(1, 2));
+
+        // alternatively, instead of manually defining all the imports, we can
+        // link an entire module that implements the operations
+        var depsBytes = await (await fetch("calculator.wasm")).arrayBuffer();
+        var deps = await WebAssembly.compile(depsBytes);
+        await linker.module("calculator", deps);
+        var mod2 = await linker.instantiate(bytes);
+        console.log(mod2.instance.exports.multiply(3, 4));
+      })();
+    </script>
+  </body>
+</html>
