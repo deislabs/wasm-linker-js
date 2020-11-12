@@ -1,11 +1,31 @@
 {
-  "name": "wasm-linker-js",
+  "name": "@deislabs/wasm-linker-js",
   "version": "0.1.0",
-  "description": "",
-  "main": "webpack.config.js",
+  "description": "A simple WebAssembly linker",
+  "keywords": [
+    "wasm",
+    "webassembly"
+  ],
+  "author": {
+    "name": "The DeisLabs team at Microsoft"
+  },
+  "homepage": "https://github.com/deislabs/wasm-linker-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deislabs/wasm-linker-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deislabs/wasm-linker-js/issues"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "directories": {
     "lib": "lib"
   },
+  "files": [
+    "dist/src/*",
+    "dist/wasm-linker.js"
+  ],
   "dependencies": {
     "asyncify-wasm": "^1.1.1"
   },

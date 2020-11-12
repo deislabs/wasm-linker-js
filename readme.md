@@ -12,7 +12,13 @@ functionality enabled by [Binaryen][binaryen] and [Asyncify][asyncify].
 ### Using the Linker
 
 > For more examples of using the Linker in both TypeScript and JavaScript, check
-> the [linker tests][linker-tests] and the [NodeJS examples][node-examples].
+> the [linker tests][linker-tests] and the [Node.js examples][node-examples].
+
+First, add the package to your project:
+
+```plaintext
+$ npm install @deislabs/wasm-linker-js
+```
 
 #### Defining a single import
 
@@ -21,6 +27,9 @@ below (transformed to its binary representation using [Binaryen][binaryen]), we
 can satisfy its import using the `define` method available on the linker:
 
 ```js
+const { Linker } = require("@deislabs/wasm-linker-js");
+const { parseText } = require("binaryen");
+
 const usingAdd = `
 (module
     (import "calculator" "add" (func $calc_add (param i32 i32) (result i32)))
@@ -47,8 +56,13 @@ var linker = new Linker();
 linker.define("calculator", "add", (a, b) => a + b);
 var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
 
-assert.equal(calc.instance.exports.add(1, 2), 3);
+var result = calc.instance.exports.add(1, 2);
 ```
+
+> Note that we import `binaryen` in the examples here to show the text format of
+> the WebAssembly modules. In real world scenarios that is not necessary, and
+> the modules can be compiled from their binary representation without
+> additional dependencies.
 
 #### Linking an entire module
 
@@ -58,6 +72,9 @@ import, we can add it to the linker, then continue instantiating our module
 (defined above in its text format and contained in the `usingAdd` constant):
 
 ```js
+const { Linker } = require("@deislabs/wasm-linker-js");
+const { parseText } = require("binaryen");
+
 const add = `
 (module
   (memory 1 1)
@@ -85,7 +102,7 @@ await linker.module(
   new WebAssembly.Module(parseText(add).emitBinary())
 );
 var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
-assert.equal(calc.instance.exports.add(1, 41), 42);
+var result = calc.instance.exports.add(1, 2);
 ```
 
 #### Defining asynchronous imports
@@ -100,6 +117,9 @@ WebAssembly modules (note that the Asyncify pass must have been applied to the
 module before instantiating using the linker):
 
 ```js
+const { Linker } = require("@deislabs/wasm-linker-js");
+const { parseText } = require("binaryen");
+
 var useAsyncify = true;
 var linker = new Linker(useAsyncify);
 
@@ -116,12 +136,12 @@ let bytes = parseText(usingAdd);
 bytes.runPasses(["asyncify"]);
 var calc = await linker.instantiate(bytes.emitBinary());
 
-assert.equal(await calc.instance.exports.add(1, 2), 3);
+var result = await calc.instance.exports.add(1, 2);
 ```
 
 The linker also allows adding an already instantiated module, through the
 `instance` method, and aliasing a module under a new name, through the `alias`
-method. All public methods defined on the Linker have a correspondent in the
+method. Most public methods defined on the Linker have a correspondent in the
 [Wasmtime][wasmtime] Linker, and we try to keep the APIs similar.
 
 ### Implementation notes and known issues
@@ -141,7 +161,24 @@ method. All public methods defined on the Linker have a correspondent in the
   linker does not currently expose streaming methods, and the WebPack
   configuration for generating a browser-compatible library is not optimal (this
   should be changed to use ECMAScript modules).
-- **This library is experimental, and the API is not stable**.
+- **This library is experimental, and the API is not stable**. We welcome
+  feedback on both the public API and the implementation of this library.
+
+### Contributing
+
+This project welcomes contributions through the GitHub pull request process.
+Prerequisites to building the project:
+
+- Node.js
+- `npm`
+
+To iterate on the project locally:
+
+```plaintext
+$ npm run build
+$ npm test
+$ npm run examples
+```
 
 ### Code of Conduct
 
