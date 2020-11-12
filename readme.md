@@ -20,6 +20,11 @@ First, add the package to your project:
 $ npm install @deislabs/wasm-linker-js
 ```
 
+> Note that in order to run the examples shown here, `binaryen` is also required
+> (`npm install binaryen`), in order to show the text format of the WebAssembly
+> modules. In real world scenarios that is not necessary, and the modules can be
+> compiled from their binary representation without additional dependencies.
+
 #### Defining a single import
 
 Assuming we are trying to instantiate the module represented in its text format
@@ -48,21 +53,20 @@ const usingAdd = `
     )
 )
 `;
-var linker = new Linker();
 
-// The "usingAdd" module imports calculator.add.
-// We define it,  provide a JS implementation, then
-// instantiate it.
-linker.define("calculator", "add", (a, b) => a + b);
-var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
+(async () => {
+  var linker = new Linker();
 
-var result = calc.instance.exports.add(1, 2);
+  // The "usingAdd" module imports calculator.add.
+  // We define it,  provide a JS implementation, then
+  // instantiate it.
+  linker.define("calculator", "add", (a, b) => a + b);
+  var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
+
+  var result = calc.instance.exports.add(1, 2);
+  console.log(result);
+})();
 ```
-
-> Note that we import `binaryen` in the examples here to show the text format of
-> the WebAssembly modules. In real world scenarios that is not necessary, and
-> the modules can be compiled from their binary representation without
-> additional dependencies.
 
 #### Linking an entire module
 
@@ -92,17 +96,20 @@ const add = `
 )
 `;
 
-var linker = new Linker();
+(async () => {
+  var linker = new Linker();
 
-// The "usingAdd" module above imports calculator.add.
-// We link a module that exports the functionality
-// required, then instantiate the module that uses it.
-await linker.module(
-  "calculator",
-  new WebAssembly.Module(parseText(add).emitBinary())
-);
-var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
-var result = calc.instance.exports.add(1, 2);
+  // The "usingAdd" module above imports calculator.add.
+  // We link a module that exports the functionality
+  // required, then instantiate the module that uses it.
+  await linker.module(
+    "calculator",
+    new WebAssembly.Module(parseText(add).emitBinary())
+  );
+  var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
+  var result = calc.instance.exports.add(1, 2);
+  console.log(result);
+})();
 ```
 
 #### Defining asynchronous imports
@@ -120,23 +127,31 @@ module before instantiating using the linker):
 const { Linker } = require("@deislabs/wasm-linker-js");
 const { parseText } = require("binaryen");
 
-var useAsyncify = true;
-var linker = new Linker(useAsyncify);
+(async () => {
+  var useAsyncify = true;
+  var linker = new Linker(useAsyncify);
 
-// Notice how we define an asynchronous import, which
-// will wait for 1.5s before returning the result.
-linker.define("calculator", "add", async (a, b) => {
-  await sleep(1500);
-  return a + b;
-});
+  // Notice how we define an asynchronous import, which
+  // will wait for 1.5s before returning the result.
+  var sleep = function (ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  };
+  linker.define("calculator", "add", async (a, b) => {
+    await sleep(1500);
+    return a + b;
+  });
 
-let bytes = parseText(usingAdd);
+  let bytes = parseText(usingAdd);
 
-// we perform the asyncify compiler pass from Binaryen
-bytes.runPasses(["asyncify"]);
-var calc = await linker.instantiate(bytes.emitBinary());
+  // we perform the asyncify compiler pass from Binaryen
+  bytes.runPasses(["asyncify"]);
+  var calc = await linker.instantiate(bytes.emitBinary());
 
-var result = await calc.instance.exports.add(1, 2);
+  var result = await calc.instance.exports.add(1, 2);
+  console.log(result);
+})();
 ```
 
 The linker also allows adding an already instantiated module, through the
