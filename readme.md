@@ -11,6 +11,9 @@ functionality enabled by [Binaryen][binaryen] and [Asyncify][asyncify].
 
 ### Using the Linker
 
+> For more examples of using the Linker in both TypeScript and JavaScript, check
+> the [linker tests][linker-tests] and the [NodeJS examples][node-examples].
+
 #### Defining a single import
 
 Assuming we are trying to instantiate the module represented in its text format
@@ -85,7 +88,7 @@ var calc = await linker.instantiate(parseText(usingAdd).emitBinary());
 assert.equal(calc.instance.exports.add(1, 41), 42);
 ```
 
-### Defining asynchronous imports
+#### Defining asynchronous imports
 
 The current WebAssembly MVP does not have a way of waiting for the execution of
 asynchronous imports (see [this issue][async-wasm-issue]). To enable this
@@ -157,3 +160,5 @@ additional questions or comments.
 [async-wasm-issue]: https://github.com/WebAssembly/design/issues/720
 [asyncify-blog]: https://kripken.github.io/blog/wasm/2019/07/16/asyncify.html
 [browser-demo]: examples/index.html
+[node-examples]: examples/node-example.js
+[linker-tests]: tests/linker.ts

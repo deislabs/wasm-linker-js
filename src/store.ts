@@ -28,6 +28,15 @@ export class Store {
   }
 
   /**
+   * Add an imports object to the imports cache.
+   */
+  public addImportObject(importObject: any): void {
+    for (const [mod, im] of Object.entries(importObject)) {
+      this.imports[mod] = im as Record<string, WebAssembly.ImportValue>;
+    }
+  }
+
+  /**
    * Add an instance to the store's instance cache, and
    * all its exports to the imports cache.
    *

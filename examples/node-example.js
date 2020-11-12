@@ -129,6 +129,27 @@ const usingAddWithAlias = `
     assert.equal(calc.instance.exports.add2(2, 99), 101);
   }
 
+  // example of using conventional import objects
+  {
+    let linker = new Linker();
+    var importObject = {
+      calculator1: {
+        add: (a, b) => a + b,
+      },
+      calculator2: {
+        add: (a, b) => a + b,
+      },
+    };
+
+    linker.imports(importObject);
+    var calc = await linker.instantiate(
+      parseText(usingAddWithAlias).emitBinary()
+    );
+
+    assert.equal(calc.instance.exports.add1(1, 99), 100);
+    assert.equal(calc.instance.exports.add2(2, 99), 101);
+  }
+
   // example of defining an asynchronous import,
   // made possible with Binaryen and asyncify-wasm
   {

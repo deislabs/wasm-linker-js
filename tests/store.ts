@@ -53,4 +53,24 @@ describe("store tests", async () => {
     assert.equal(store.imports["calculator2"]["function1"], fn1);
     assert.equal(store.imports["calculator2"]["function2"], fn2);
   });
+
+  it("an import object is correctly added to the store", () => {
+    let store = new Store();
+
+    let name = "someModule";
+    let fnName = "imported_func";
+    let fn = () => {};
+
+    let importObject = {
+      [name]: {
+        [fnName]: fn,
+      },
+    };
+
+    store.addImportObject(importObject);
+
+    assert.equal(Object.keys(store.imports).length, 1);
+    assert.equal(Object.keys(store.imports["someModule"]).length, 1);
+    assert.equal(store.imports[name][fnName], fn);
+  });
 });

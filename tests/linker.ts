@@ -79,6 +79,37 @@ describe("linker tests", async () => {
     );
     assert.equal(await (instance.exports["add"] as Function)(1, 2), 3);
   });
+
+  it("add import object to the linker", async () => {
+    let linker = new Linker();
+    var importObject = {
+      calculator: {
+        add: (a: number, b: number) => a + b,
+      },
+    };
+
+    linker.imports(importObject);
+    let instance = await linker.instantiate(wat.moduleFromText(wat.usingAdd));
+    assert.equal(await (instance.exports["add"] as Function)(1, 2), 3);
+  });
+
+  it("add import object with multiple imports to the linker", async () => {
+    let linker = new Linker();
+    var importObject = {
+      calculator1: {
+        add: (a: number, b: number) => a + b,
+      },
+      calculator2: {
+        add: (a: number, b: number) => a + b,
+      },
+    };
+
+    linker.imports(importObject);
+    let instance = await linker.instantiate(
+      wat.moduleFromText(wat.usingAddWithAlias)
+    );
+    assert.equal(await (instance.exports["add"] as Function)(1, 2), 3);
+  });
 });
 
 async function sleep(ms: number) {

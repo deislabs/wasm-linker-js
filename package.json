@@ -7,10 +7,7 @@
     "lib": "lib"
   },
   "dependencies": {
-    "asyncify-wasm": "^1.1.1",
-    "cross-fetch": "^3.0.5",
-    "node-fetch": "^2.6.0",
-    "uuid": "^8.3.0"
+    "asyncify-wasm": "^1.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.0.1",
@@ -32,7 +29,7 @@
   "scripts": {
     "build": "tsc && webpack --debug",
     "test": "mocha --timeout 90000 --require ts-node/register --project tsconfig.json --recursive ./tests/**/*.ts",
-    "examples": "npm run build && node examples/node-example.js"
+    "examples": "npm run build && cd examples && node node-example.js && node --experimental-wasi-unstable-preview1 --experimental-wasm-bigint wasi-example.js"
   },
   "license": "MIT"
 }

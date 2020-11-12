@@ -274,6 +274,57 @@ const assert = require("assert");
       : await WebAssembly.instantiate(module, this.store.imports);
   }
 
+  /**
+   * Add an imports object to the linker.
+   * Example:
+   * ```js
+const { Linker } = require("@deislabs/wasm-linker-js");
+const { parseText } = require("binaryen");
+const assert = require("assert");
+
+(async () => {
+  const usingAdd = `
+    (module
+        (import "calculator" "add" (func $calc_add (param i32 i32) (result i32))
+        (export "add" (func $add))
+    
+        (func $add (param i32) (param i32) (result i32)
+            (return
+                (call $calc_add
+                    (local.get 0)
+                    (local.get 1)
+                )
+            )
+        )
+    )
+    `;
+
+  var linker = new Linker();
+
+  var importObject = {
+    calculator: {
+      add: (a: number, b: number) => a + b,
+    },
+  };
+
+  linker.imports(importObject);
+
+  var calc = await linker.instantiate(
+    parseText(usingAdd).emitBinary());
+  assert.equal(await calc.instance.exports.add(1, 2), 3)
+   * ```
+   */
+  imports(importObject: any): void {
+    // This ensures that import objects defined using the
+    // current convention can be directly reused when
+    // using this linker.
+    //
+    // The signature is not ideal, and in the future we
+    // should explore making `importObject` a typed
+    // object.
+    return this.store.addImportObject(importObject);
+  }
+
   // This is currently unused.
   // If we were to use this type of resolution, we would always
   // have to make an explicit choice between first adding imports
