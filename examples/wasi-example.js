@@ -1,7 +1,6 @@
 "use strict";
 const { WASI } = require("wasi");
 const { Linker } = require("../dist/src/index");
-const assert = require("assert");
 const fs = require("fs");
 const wasi = new WASI();
 

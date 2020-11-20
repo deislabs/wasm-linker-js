@@ -1,4 +1,8 @@
-# A simple WebAssembly Linker in JavaScript
+# wasm-linker-js
+
+### A simple WebAssembly Linker in JavaScript
+
+![actions badge][actions-badge] [![NPM version][npm-image]][npm]
 
 This is _an experimental_ JavaScript library that helps instantiating
 WebAssembly modules with imports by providing functionality to link JavaScript
@@ -214,3 +218,7 @@ additional questions or comments.
 [browser-demo]: examples/index.html
 [node-examples]: examples/node-example.js
 [linker-tests]: tests/linker.ts
+[npm-image]: https://badge.fury.io/js/%40deislabs%2Fwasm-linker-js.svg
+[npm]: https://www.npmjs.com/package/@deislabs/wasm-linker-js
+[actions-badge]:
+  https://github.com/deislabs/wasm-linker-js/workflows/Build%20and%20Test/badge.svg
