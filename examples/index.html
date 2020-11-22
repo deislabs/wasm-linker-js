@@ -10,6 +10,47 @@
   <body>
     <script type="module" language="javascript" type="text/javascript">
       (async () => {
+        // Note that in Safari (both desktop and mobile versions), the
+        // compileStreaming and instantiateStreaming APIs are not implemented.
+
+        var linker = new Linker();
+        await linker.moduleStreaming("calculator", fetch("calculator.wasm"));
+        var mod = await linker.instantiateStreaming(
+          fetch("using_calculator.wasm")
+        );
+        console.log(mod.instance.exports.multiply(3, 4));
+
+        // Using Asyncify
+        //
+        // Note that the module used must have been transformed using
+        // Asyncify. See https://kripken.github.io/blog/wasm/2019/07/16/asyncify.html
+        var useAsyncify = true;
+        var linker2 = new Linker(useAsyncify);
+
+        var sleep = function sleep(ms) {
+          return new Promise((resolve) => setTimeout(resolve, ms));
+        };
+
+        linker2.define("calculator", "add", async (a, b) => {
+          // before returning, this function sleeps for 3 seconds
+          await sleep(3000);
+          return a + b;
+        });
+
+        // we don't really care about the other methods, but we
+        // have to define them to instantiate the module.
+        linker2.define("calculator", "multiply", (a, b) => a * b);
+        linker2.define("calculator", "subtract", (a, b) => a - b);
+        linker2.define("calculator", "divide", (a, b) => a / b);
+
+        var mod2 = await linker2.instantiateStreaming(
+          fetch("using_calculator_async.wasm")
+        );
+        console.log(await mod2.instance.exports.add(3, 4));
+
+        // For browsers that do not support the *streaming APIs, the regular
+        // linker API can be used instead:
+        /*
         var linker = new Linker();
 
         linker.define("calculator", "add", (a, b) => a + b);
@@ -29,6 +70,7 @@
         await linker.module("calculator", deps);
         var mod2 = await linker.instantiate(bytes);
         console.log(mod2.instance.exports.multiply(3, 4));
+        */
       })();
     </script>
   </body>
