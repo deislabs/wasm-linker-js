@@ -122,6 +122,28 @@ const assert = require("assert");
   }
 
   /**
+   * Instantiate a module using `instantiateStreaming` and add its exports 
+   * to the linker's cache.
+   * Not available in Safari and Node.js.
+   * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiateStreaming
+   * Example:
+   * ```js
+        var linker = new Linker();
+        await linker.moduleStreaming("calculator", fetch("calculator.wasm"));
+        var mod = await linker.instantiateStreaming(
+          fetch("using_calculator.wasm")
+        );
+        console.log(mod.instance.exports.multiply(3, 4));
+```
+   */
+  async moduleStreaming(name: string, source: Response): Promise<void> {
+    return this.store.addInstance(
+      name,
+      await (await this.instantiateStreaming(source)).instance
+    );
+  }
+
+  /**
    * Add an instance to the linker's instance cache.
    * Example:
    * ```js
@@ -272,6 +294,29 @@ const assert = require("assert");
     return this.useAsyncify
       ? await asyncify.instantiate(module, this.store.imports)
       : await WebAssembly.instantiate(module, this.store.imports);
+  }
+
+  /**
+   * Compile and instantiate a WebAssembly module directly from a streamed 
+   * underlying source.
+   * Not available in Safari and Node.js.
+   * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiateStreaming
+   * 
+   * Example:
+   * ```js
+        var linker = new Linker();
+        var mod = await linker.instantiateStreaming(
+          fetch("calculator.wasm")
+        );
+        console.log(mod.instance.exports.multiply(3, 4));
+```
+   */
+  async instantiateStreaming(
+    source: Response
+  ): Promise<WebAssembly.WebAssemblyInstantiatedSource> {
+    return this.useAsyncify
+      ? await asyncify.instantiateStreaming(source, this.store.imports)
+      : await WebAssembly.instantiateStreaming(source, this.store.imports);
   }
 
   /**

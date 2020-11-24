@@ -158,6 +158,26 @@ const { parseText } = require("binaryen");
 })();
 ```
 
+#### Using the streaming APIs in the browser
+
+For browsers that support the WebAssembly streaming APIs, the linker exposes two
+methods that can be used to efficiently instantiate modules from a streamed
+source: `moduleStreaming`, which instantiates a module and adds its exports to
+the linker's cache, and `instantiateStreaming`, which instantiates a module and
+returns its the `WebAssemblyInstantiatedSource`:
+
+```js
+(async () => {
+  var linker = new Linker();
+  await linker.moduleStreaming("calculator", fetch("calculator.wasm"));
+  var mod = await linker.instantiateStreaming(fetch("using_calculator.wasm"));
+  console.log(mod.instance.exports.multiply(3, 4));
+}
+```
+
+See [the documentation for the browser streaming APIs][mdn-streaming] for more
+information about instantiating modules from streamed sources.
+
 The linker also allows adding an already instantiated module, through the
 `instance` method, and aliasing a module under a new name, through the `alias`
 method. Most public methods defined on the Linker have a correspondent in the
@@ -177,9 +197,8 @@ method. Most public methods defined on the Linker have a correspondent in the
   the `instance` method).
 - There is a [browser example in the `examples/` directory][browser-demo] in
   this repository. While functional, the implementation is far from ideal - the
-  linker does not currently expose streaming methods, and the WebPack
-  configuration for generating a browser-compatible library is not optimal (this
-  should be changed to use ECMAScript modules).
+  WebPack configuration for generating a browser-compatible library is not
+  optimal (this should be changed to use ECMAScript modules).
 - **This library is experimental, and the API is not stable**. We welcome
   feedback on both the public API and the implementation of this library.
 
@@ -218,6 +237,8 @@ additional questions or comments.
 [browser-demo]: examples/index.html
 [node-examples]: examples/node-example.js
 [linker-tests]: tests/linker.ts
+[mdn-streaming]:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiateStreaming
 [npm-image]: https://badge.fury.io/js/%40deislabs%2Fwasm-linker-js.svg
 [npm]: https://www.npmjs.com/package/@deislabs/wasm-linker-js
 [actions-badge]:
