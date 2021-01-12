@@ -27,7 +27,7 @@
     "dist/wasm-linker.js"
   ],
   "dependencies": {
-    "asyncify-wasm": "^1.1.1"
+    "asyncify-wasm": "^1.1.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^6.1.0",
