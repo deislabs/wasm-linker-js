@@ -30,7 +30,6 @@
     "asyncify-wasm": "^1.1.2"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^6.1.0",
     "@types/chai": "^4.0.1",
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.14",
@@ -40,15 +39,15 @@
     "chai": "^4.1.0",
     "express": "4.17.1",
     "mocha": "^8.2.1",
-    "ssri": ">=8.0.1",
-    "ts-loader": "^8.0.12",
+    "ssri": "^8.0.1",
+    "ts-loader": "^9.2.3",
     "ts-node": "^9.1.1",
     "typescript": "^3.8.3",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2"
   },
   "scripts": {
-    "build": "tsc && webpack --debug",
+    "build": "tsc && webpack",
     "test": "mocha --timeout 90000 --require ts-node/register --project tsconfig.json --recursive ./tests/**/*.ts",
     "examples": "npm run build && cd examples && node node-example.js && node --experimental-wasi-unstable-preview1 --experimental-wasm-bigint wasi-example.js"
   },
