@@ -1,6 +1,6 @@
 {
   "name": "@deislabs/wasm-linker-js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A simple WebAssembly linker",
   "keywords": [
     "wasm",
